@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  sftp:
+    image: atmoz/sftp:alpine
+    container_name: sftp
+    ports:
+      - "2222:22"
+    command: "test:pass:::upload"
