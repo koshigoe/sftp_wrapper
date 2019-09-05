@@ -1,0 +1,76 @@
+name: Continuous Integration
+on: [push]
+jobs:
+  build:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        ruby:
+          - "2.3"
+          - "2.4"
+          - "2.5"
+          - "2.6"
+    services:
+      sftp:
+        image: atmoz/sftp:alpine
+        ports:
+          - "2222:22"
+        env:
+          SFTP_USERS: "test:pass:::upload"
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Ruby ${{ matrix.ruby_version }}
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          architecture: 'x64'
+      - name: install curl (enabled SFTP support)
+        run: |
+          sudo apt purge curl
+          sudo apt update
+          sudo apt install -y libssh2-1-dev libssl-dev ca-certificates
+          sudo apt install -y binutils g++ make
+          cd /tmp
+          wget https://curl.haxx.se/download/curl-7.65.3.tar.gz
+          tar xzvf curl-7.65.3.tar.gz
+          cd curl-7.65.3
+          ./configure --disable-libcurl-option --disable-shared --with-libssh2 --with-ssl
+          make
+          sudo make install
+      - name: bundle install, run test
+        run: |
+          gem install bundler -v1.17 --force --no-document
+          bundle install
+          bundle exec rake
+  release:
+    name: Release Gem
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "2.6"
+          architecture: "x64"
+      - name: Setup RubyGems
+        run: |
+          # NOTE: use rubygems v3.0.5+ to works GEM_HOST_API_KEY.
+          gem update --system
+          # NOTE: set `--force` option to avoid error: `"bundle" from bundler conflicts with ...`
+          gem install bundler -v1.17 --force --no-document
+      - name: Build Gem
+        run: |
+          bundle
+          bundle exec rake build
+          bundle exec rake install
+      - name: Push Gem
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
+        run: |
+          gem -v
+          gem push pkg/sftp_wrapper-*.gem
