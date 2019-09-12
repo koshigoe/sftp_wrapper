@@ -40,10 +40,12 @@ jobs:
           ./configure --disable-libcurl-option --disable-shared --with-libssh2 --with-ssl
           make
           sudo make install
-      - name: bundle install, run test
+      - name: setup rubygems
         run: |
           gem install bundler -v1.17 --force --no-document
           bundle install
+      - name: run test
+        run: |
           bundle exec rake
   release:
     name: Release Gem
