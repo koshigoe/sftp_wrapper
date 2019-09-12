@@ -47,6 +47,9 @@ jobs:
       - name: rubocop
         run: |
           bundle exec rubocop
+      - name: yard
+        run: |
+          bundle exec yard --fail-on-warning
       - name: run test
         run: |
           bundle exec rake
