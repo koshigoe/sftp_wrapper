@@ -4,6 +4,7 @@ AllCops:
 Metrics/BlockLength:
   Exclude:
     - "test/**/*_test.rb"
+    - "benchmark/*.rb"
     - "*.gemspec"
 
 Metrics/ClassLength:
