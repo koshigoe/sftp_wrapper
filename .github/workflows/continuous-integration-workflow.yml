@@ -44,6 +44,9 @@ jobs:
         run: |
           gem install bundler -v1.17 --force --no-document
           bundle install
+      - name: rubocop
+        run: |
+          bundle exec rubocop
       - name: run test
         run: |
           bundle exec rake
