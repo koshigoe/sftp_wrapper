@@ -6,7 +6,14 @@ class SftpWrapperCurlTest < Minitest::Test
   describe '#download' do
     describe 'SftpWrapper::Errors::ConnectionError' do
       it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new('localhost', 2223, 'test', 'pass', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2223,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.close
           e = assert_raises(SftpWrapper::Errors::ConnectionError) do
@@ -19,7 +26,14 @@ class SftpWrapperCurlTest < Minitest::Test
 
     describe 'SftpWrapper::Errors::AuthenticationFailure' do
       it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new('localhost', 2222, 'test', 'passs', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'passs',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.close
           e = assert_raises(SftpWrapper::Errors::AuthenticationFailure) do
@@ -32,7 +46,14 @@ class SftpWrapperCurlTest < Minitest::Test
 
     describe 'SftpWrapper::Errors::CommandError' do
       it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new('localhost', 2222, 'test', 'pass', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.close
           e = assert_raises(SftpWrapper::Errors::CommandError) do
@@ -62,7 +83,14 @@ class SftpWrapperCurlTest < Minitest::Test
           end
         end
 
-        wrapper = SftpWrapper::Curl.new('localhost', 2222, 'test', 'pass', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.close
           wrapper.download('/upload/file', temp.path)
@@ -75,7 +103,14 @@ class SftpWrapperCurlTest < Minitest::Test
   describe '#upload' do
     describe 'SftpWrapper::Errors::ConnectionError' do
       it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new('localhost', 2223, 'test', 'pass', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2223,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.close
           e = assert_raises(SftpWrapper::Errors::ConnectionError) do
@@ -88,7 +123,14 @@ class SftpWrapperCurlTest < Minitest::Test
 
     describe 'SftpWrapper::Errors::AuthenticationFailure' do
       it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new('localhost', 2222, 'test', 'passs', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'passs',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.close
           e = assert_raises(SftpWrapper::Errors::AuthenticationFailure) do
@@ -101,7 +143,14 @@ class SftpWrapperCurlTest < Minitest::Test
 
     describe 'SftpWrapper::Errors::CommandError' do
       it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new('localhost', 2222, 'test', 'pass', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
 
         e = assert_raises(SftpWrapper::Errors::CommandError) do
           wrapper.upload('notfound', '/upload/file')
@@ -130,7 +179,14 @@ class SftpWrapperCurlTest < Minitest::Test
           end
         end
 
-        wrapper = SftpWrapper::Curl.new('localhost', 2222, 'test', 'pass', command_path: CURL_COMMAND_PATH)
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecure]
+        )
         Tempfile.create('temp') do |temp|
           temp.write('uploaded')
           temp.close

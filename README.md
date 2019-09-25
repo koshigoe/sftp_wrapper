@@ -26,7 +26,7 @@ Or install it yourself as:
 require 'sftp_wrapper'
 
 SftpWrapper::OpenSSH.new('localhost', 2222, 'test', 'pass').download('/upload/file', './file')
-SftpWrapper::Curl.new('localhost', 2222, 'test', 'pass').download('/upload/file', './file')
+SftpWrapper::Curl.new('localhost', 2222, 'test', 'pass', curl_args: ['--silent', '--insecure']).download('/upload/file', './file')
 ```
 
 ## Development
