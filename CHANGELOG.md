@@ -1,6 +1,14 @@
 Changelog
 ====
 
+[v0.2.2](https://github.com/koshigoe/sftp_wrapper/releases/tag/v0.2.2)
+----
+
+### Enhancements
+
+- [#3](https://github.com/koshigoe/sftp_wrapper/pull/3) handle `curl` exit status 3.
+
+
 [v0.2.1](https://github.com/koshigoe/sftp_wrapper/releases/tag/v0.2.1)
 ----
 
