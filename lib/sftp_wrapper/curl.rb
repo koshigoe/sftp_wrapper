@@ -7,7 +7,7 @@ require 'open3'
 module SftpWrapper
   # The wrapper for curl.
   class Curl
-    attr_reader :host, :port, :username, :password, :curl_command, :curl_options
+    attr_reader :host, :port, :username, :password, :curl_path, :curl_args
 
     # lookup table of curl errors.
     CURL_ERRORS = {
@@ -23,15 +23,17 @@ module SftpWrapper
     # @param port [Integer] port number of SFTP server
     # @param username [String] user name of SFTP server
     # @param password [String] password of SFTP server
-    # @param curl_options [Hash] curl options. (e.g. --connect-timeout 1 => connect_timeout: 1)
+    # @param options [Hash] curl options.
+    # @option options [String] :curl_path path of `curl` command.
+    # @option options [Array<String>] :curl_args command line arguments of `curl`.
     #
-    def initialize(host, port, username, password, curl_options = {})
+    def initialize(host, port, username, password, options = {})
       @host = host
       @port = port
       @username = username
       @password = password
-      @curl_command = curl_options.key?(:command_path) ? curl_options.delete(:command_path) : 'curl'
-      @curl_options = curl_options
+      @curl_path = options[:curl_path] || 'curl'
+      @curl_args = options[:curl_args] || []
     end
 
     # Get remote file.
@@ -45,7 +47,7 @@ module SftpWrapper
     def download(source, destination)
       userinfo = [username, password].map(&ERB::Util.method(:url_encode)).join(':')
       uri = URI::Generic.build(scheme: 'sftp', userinfo: userinfo, host: host, port: port, path: source)
-      cmd = %W[#{curl_command} -s --insecure -o #{destination}] + build_curl_options + [uri.to_s]
+      cmd = %W[#{curl_path} -o #{destination}] + curl_args + [uri.to_s]
 
       execute(*cmd)
     end
@@ -61,16 +63,12 @@ module SftpWrapper
     def upload(source, destination)
       userinfo = [username, password].map(&ERB::Util.method(:url_encode)).join(':')
       uri = URI::Generic.build(scheme: 'sftp', userinfo: userinfo, host: host, port: port, path: destination)
-      cmd = %W[#{curl_command} -s --insecure -T #{source}] + build_curl_options + [uri.to_s]
+      cmd = %W[#{curl_path} -T #{source}] + curl_args + [uri.to_s]
 
       execute(*cmd)
     end
 
     private
-
-    def build_curl_options
-      curl_options.map { |k, v| ["--#{k.tr('_', '-')}", v] }.flatten
-    end
 
     def execute(*cmd)
       _, stderr, status = Open3.capture3(*cmd)
