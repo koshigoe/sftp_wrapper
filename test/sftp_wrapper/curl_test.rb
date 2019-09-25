@@ -25,6 +25,26 @@ class SftpWrapperCurlTest < Minitest::Test
         end
       end
 
+      describe 'wrong url' do
+        it 'raise exception' do
+          wrapper = SftpWrapper::Curl.new(
+            'localhost',
+            0,
+            'test',
+            'pass',
+            curl_path: CURL_COMMAND_PATH,
+            curl_args: %w[-s --insecure]
+          )
+          Tempfile.create('temp') do |temp|
+            temp.close
+            e = assert_raises(SftpWrapper::Errors::ConnectionError) do
+              wrapper.download('/upload/file', temp.path)
+            end
+            assert_match(/\Aexit status \d+: .*/m, e.message)
+          end
+        end
+      end
+
       describe 'wrong host' do
         it 'raise exception' do
           wrapper = SftpWrapper::Curl.new(

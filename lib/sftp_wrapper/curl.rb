@@ -11,6 +11,8 @@ module SftpWrapper
 
     # lookup table of curl errors.
     CURL_ERRORS = {
+      # URL malformed. The syntax was not correct.
+      3 => SftpWrapper::Errors::ConnectionError,
       # Couldn't resolve proxy. The given proxy host could not be resolved.
       5 => SftpWrapper::Errors::ConnectionError,
       # Couldn't resolve host. The given remote host was not resolved.
