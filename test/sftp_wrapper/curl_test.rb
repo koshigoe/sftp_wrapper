@@ -5,21 +5,63 @@ require 'test_helper'
 class SftpWrapperCurlTest < Minitest::Test
   describe '#download' do
     describe 'SftpWrapper::Errors::ConnectionError' do
-      it 'raise exception' do
-        wrapper = SftpWrapper::Curl.new(
-          'localhost',
-          2223,
-          'test',
-          'pass',
-          curl_path: CURL_COMMAND_PATH,
-          curl_args: %w[-s --insecure]
-        )
-        Tempfile.create('temp') do |temp|
-          temp.close
-          e = assert_raises(SftpWrapper::Errors::ConnectionError) do
-            wrapper.download('/upload/file', temp.path)
+      describe 'wrong port' do
+        it 'raise exception' do
+          wrapper = SftpWrapper::Curl.new(
+            'localhost',
+            2223,
+            'test',
+            'pass',
+            curl_path: CURL_COMMAND_PATH,
+            curl_args: %w[-s --insecure]
+          )
+          Tempfile.create('temp') do |temp|
+            temp.close
+            e = assert_raises(SftpWrapper::Errors::ConnectionError) do
+              wrapper.download('/upload/file', temp.path)
+            end
+            assert_match(/\Aexit status \d+: .*/m, e.message)
           end
-          assert_match(/\Aexit status \d+: .*/m, e.message)
+        end
+      end
+
+      describe 'wrong host' do
+        it 'raise exception' do
+          wrapper = SftpWrapper::Curl.new(
+            '1234.5.6.7',
+            2222,
+            'test',
+            'pass',
+            curl_path: CURL_COMMAND_PATH,
+            curl_args: %w[-s --insecure]
+          )
+          Tempfile.create('temp') do |temp|
+            temp.close
+            e = assert_raises(SftpWrapper::Errors::ConnectionError) do
+              wrapper.download('/upload/file', temp.path)
+            end
+            assert_match(/\Aexit status \d+: .*/m, e.message)
+          end
+        end
+      end
+
+      describe 'wrong proxy host' do
+        it 'raise exception' do
+          wrapper = SftpWrapper::Curl.new(
+            'localhost',
+            2222,
+            'test',
+            'pass',
+            curl_path: CURL_COMMAND_PATH,
+            curl_args: %w[-s --insecure --proxy-insecure --proxy 1234.5.6.7]
+          )
+          Tempfile.create('temp') do |temp|
+            temp.close
+            e = assert_raises(SftpWrapper::Errors::ConnectionError) do
+              wrapper.download('/upload/file', temp.path)
+            end
+            assert_match(/\Aexit status \d+: .*/m, e.message)
+          end
         end
       end
     end
@@ -44,7 +86,7 @@ class SftpWrapperCurlTest < Minitest::Test
       end
     end
 
-    describe 'SftpWrapper::Errors::CommandError' do
+    describe 'SftpWrapper::Errors::ResourceNotExist' do
       it 'raise exception' do
         wrapper = SftpWrapper::Curl.new(
           'localhost',
@@ -56,8 +98,28 @@ class SftpWrapperCurlTest < Minitest::Test
         )
         Tempfile.create('temp') do |temp|
           temp.close
-          e = assert_raises(SftpWrapper::Errors::CommandError) do
+          e = assert_raises(SftpWrapper::Errors::ResourceNotExist) do
             wrapper.download('/notfound', temp.path)
+          end
+          assert_match(/\Aexit status \d+: .*/m, e.message)
+        end
+      end
+    end
+
+    describe 'SftpWrapper::Errors::CommandError' do
+      it 'raise exception' do
+        wrapper = SftpWrapper::Curl.new(
+          'localhost',
+          2222,
+          'test',
+          'pass',
+          curl_path: CURL_COMMAND_PATH,
+          curl_args: %w[-s --insecureeeeee]
+        )
+        Tempfile.create('temp') do |temp|
+          temp.close
+          e = assert_raises(SftpWrapper::Errors::CommandError) do
+            wrapper.download('/', temp.path)
           end
           assert_match(/\Aexit status \d+: .*/m, e.message)
         end

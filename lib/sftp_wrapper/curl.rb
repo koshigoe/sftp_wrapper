@@ -11,10 +11,16 @@ module SftpWrapper
 
     # lookup table of curl errors.
     CURL_ERRORS = {
+      # Couldn't resolve proxy. The given proxy host could not be resolved.
+      5 => SftpWrapper::Errors::ConnectionError,
+      # Couldn't resolve host. The given remote host was not resolved.
+      6 => SftpWrapper::Errors::ConnectionError,
       # Failed to connect to host.
       7 => SftpWrapper::Errors::ConnectionError,
       # The user name, password, or similar was not accepted and curl failed to log in.
       67 => SftpWrapper::Errors::AuthenticationFailure,
+      # The resource referenced in the URL does not exist.
+      78 => SftpWrapper::Errors::ResourceNotExist,
     }.freeze
 
     # Initialize SFTP wrapper.

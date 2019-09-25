@@ -17,5 +17,8 @@ module SftpWrapper
 
     # Command failed.
     class CommandError < Error; end
+
+    # Resource does not exist.
+    class ResourceNotExist < Error; end
   end
 end
